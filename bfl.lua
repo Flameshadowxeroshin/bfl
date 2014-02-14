@@ -1,7 +1,7 @@
 --bfl r1a by tertu
---licensed under cc0
+--this is public domain software.
 --This library includes functions to convert bf code to Lua, optimizing it slightly.
---bf.lua, a bf interpreter for Lua using bfl, should be included.
+--anyfuck.lua, a bf interpreter for Lua using bfl, should be included.
 local bfl = {}
 local joinFormat = "%s\n%s"
 

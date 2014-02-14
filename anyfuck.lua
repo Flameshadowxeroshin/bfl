@@ -1,6 +1,7 @@
 #!/usr/bin/lua
---anyfuck1.lua by tertu
+--anyfuck.lua r1 by tertu
 --this is the initial ugly version of anyfuck.
+--this is public domain software.
 if loadstring then load = loadstring end
 local function foreachChar(s,fn)
 	s:gsub(".",fn)
