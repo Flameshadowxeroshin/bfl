@@ -1,4 +1,4 @@
---bfl r1a by tertu
+--bfl r2 by tertu
 --this is public domain software.
 --This library includes functions to convert bf code to Lua, optimizing it slightly.
 --anyfuck.lua, a bf interpreter for Lua using bfl, should be included.
@@ -94,11 +94,12 @@ end
 
 function bfl.buildFromString(sProgram)
 	local tokens = bfl.tokenize(sProgram)
-	local body = header
+	--modifications suggested by rdebath, they speed up the compile significantly
+	local body = {header}
 	for _,token in ipairs(tokens) do
-		body = string.format(joinFormat, body, bfl.decodeToken(token))
+		body[#body+1] = bfl.decodeToken(token)
 	end
-	return body
+	return table.concat(body,"\n")
 end
 
 return bfl
