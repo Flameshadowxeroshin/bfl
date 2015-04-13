@@ -1,21 +1,47 @@
---bfl r2 by tertu
+--bfl r2.1 by tertu
 --this is public domain software.
 --This library includes functions to convert bf code to Lua, optimizing it slightly.
 --anyfuck.lua, a bf interpreter for Lua using bfl, should be included.
 local bfl = {}
-local joinFormat = "%s\n%s"
 
-local packedInstructions = {
+local function tableShallowCopy(tInput)
+	local tOutput = {}
+	for key,value in pairs(tInput) do
+		tOutput[key] = value
+	end
+	return tOutput
+end
+
+local oPackedInstructions = {
 	[">"] = "mp=(mp+$)@";
 	["<"] = "mp=(mp-$)@";
 	["+"] = "m[mp]=(m[mp]+$)&";
 	["-"] = "m[mp]=(m[mp]-$)&";
 	["."] = "io.write(string.rep(string.char(m[mp]%256),$))"}
 
-local unpackedInstructions = {
+local packedInstructions = oPackedInstructions
+
+local oUnpackedInstructions = {
 	[","] = "m[mp]=io.read(1):byte()&";
 	["["] = "while m[mp]~=0 do";
 	["]"] = "end"}
+
+local unpackedInstructions = oUnpackedInstructions
+
+local function setArrayCellModCode(arrayModCode, cellModCode)
+	packedInstructions = tableShallowCopy(oPackedInstructions)
+	unpackedInstructions = tableShallowCopy(oUnpackedInstructions)
+	for key,sInst in pairs(packedInstructions) do
+		packedInstructions[key] = sInst:gsub("%@",arrayModCode)
+		packedInstructions[key] = sInst:gsub("%&",cellModCode)
+	end
+	for key,sInst in pairs(unpackedInstructions) do
+		unpackedInstructions[key] = sInst:gsub("%&",cellModCode)
+	end
+end
+
+setArrayCellModCode("","")
+
 
 local function prepToken(tToken,character)
 	tToken[1] = character
@@ -49,45 +75,24 @@ function bfl.tokenize(sProgram)
 	return tokenTable
 end
 
---old token decoder. doesn't support wrapping.
---[[
-function bfl.decodeToken(tToken)
-	local character = tToken[1]
-	if packedInstructions[character] then
-		local s = packedInstructions[character]:gsub("%$", tToken[2])
-		return s
-	elseif unpackedInstructions[character] then
-		local line = unpackedInstructions[character]
-		local outputBlock = line
-		for count=1,tToken[2]-1 do
-			outputBlock = string.format(joinFormat, outputBlock, line)
-		end
-		return outputBlock
-	end
-	return ""
-end]]
-
---Bad arrayModCode or cellModCode values will render the Lua uncompilable.
 function bfl.decodeToken(tToken, arrayModCode, cellModCode)
-	arrayModCode = arrayModCode or ""
-	cellModCode = cellModCode or ""
-	local elements = {["$"]=tToken[2], ["@"]=arrayModCode, ["&"]=cellModCode}
-	local function elementReplace(c) return elements[c] end
+	if arrayModCode or cellModCode
+		arrayModCode = arrayModCode or ""
+		cellModCode = cellModCode or ""
+		setArrayCellModCode(arrayModCode,cellModCode)
+	end
 	local character = tToken[1]
 	local codeBlock = packedInstructions[character] or unpackedInstructions[character]
 	if codeBlock == nil then return "" end
 	if packedInstructions[character] then
-		codeBlock = codeBlock:gsub("(%$)",elementReplace)
+		codeBlock = codeBlock:gsub("%$",tostring(tToken[2]))
 	end
-	codeBlock = codeBlock:gsub("(%@)",elementReplace)
-	codeBlock = codeBlock:gsub("(%&)",elementReplace)
 	if unpackedInstructions[character] then
-		codeBlock = codeBlock:gsub("(%&)",elementReplace)
-		local tBlock = ""
+		local tsBlock = {}
 		for i=1,tToken[2] do
-			tBlock = joinFormat:format(tBlock, codeBlock)
+			table.insert(tsBlock,codeBlock)
 		end
-		codeBlock = tBlock
+		codeBlock = table.concat(body,"\n")
 	end
 	return codeBlock
 end
