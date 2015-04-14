@@ -2,8 +2,6 @@
 --tokens module
 local tokens = {}
 
-
-
 function tokens.tokenize(sProgram)
 	local tokenTable = {}
 	local tokenInProgress = nil

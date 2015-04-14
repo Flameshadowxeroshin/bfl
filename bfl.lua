@@ -79,15 +79,15 @@ function bfl.decodeToken(tToken, arrayModCode, cellModCode)
 		cellModCode = cellModCode or ""
 		setArrayCellModCode(arrayModCode,cellModCode)
 	end
-	local character = tToken[1]
+	local character = tToken.op
 	local codeBlock = packedInstructions[character] or unpackedInstructions[character]
 	if codeBlock == nil then return "" end
 	if packedInstructions[character] then
-		codeBlock = codeBlock:gsub("%$",tostring(tToken[2]))
+		codeBlock = codeBlock:gsub("%$",tostring(tToken.count))
 	end
 	if unpackedInstructions[character] then
 		local tsBlock = {}
-		for i=1,tToken[2] do
+		for i=1,tToken.count do
 			table.insert(tsBlock,codeBlock)
 		end
 		codeBlock = table.concat(body,"\n")
