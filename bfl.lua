@@ -59,7 +59,7 @@ function bfl.tokenize(sProgram)
 	local tokenInProgress = nil
 
 	local function processCharacter(currentCharacter)
-		if (not tokenInProgress) or tokenInProgress[1]~=currentCharacter then
+		if (not tokenInProgress) or tokenInProgress.op~=currentCharacter then
 			if tokenInProgress then
 				table.insert(tokenTable, tokenInProgress)
 			end
