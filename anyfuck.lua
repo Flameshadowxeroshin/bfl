@@ -1,5 +1,5 @@
 #!/usr/bin/lua
---anyfuck.lua r1 by tertu
+--anyfuck.lua r2 by tertu
 --this is the initial ugly version of anyfuck.
 --this is public domain software.
 if loadstring then load = loadstring end
@@ -64,9 +64,11 @@ local chosenIdiom = "brainfuck"
 local fileName = ""
 
 local nextIsIdiom = false
+local showTime = false
 
 for a=1, #arg do
 	if arg[a] == "-i" then nextIsIdiom = true
+	elseif arg[a] == "-t" then showTime = true
 	elseif nextIsIdiom then chosenIdiom = arg[a]
 	else fileName = arg[a] end
 end
@@ -89,8 +91,8 @@ if prgm == nil then
 	print("bf compile error, probably mismatched []")
 	return 1
 end
-print(string.format("compiled in %d ms",(os.clock()-cloq)*1000))
+if showTime then print(string.format("compiled in %d ms",(os.clock()-cloq)*1000)) end
 local cloq = os.clock()
 prgm()
 print()
-print(string.format("executed in %d ms",(os.clock()-cloq)*1000))
+if showTime then print(string.format("executed in %d ms",(os.clock()-cloq)*1000)) end
