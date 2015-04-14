@@ -1,6 +1,7 @@
 #!/usr/bin/lua
---anyfuck.lua r1 by tertu
+--anyfuck.lua r2.01 by tertu
 --this is the initial ugly version of anyfuck.
+--requires Lua 5.2 or later.
 --this is public domain software.
 if loadstring then load = loadstring end
 local function foreachChar(s,fn)
@@ -64,10 +65,12 @@ local chosenIdiom = "brainfuck"
 local fileName = ""
 
 local nextIsIdiom = false
+local showTime = false
 
 for a=1, #arg do
 	if arg[a] == "-i" then nextIsIdiom = true
-	elseif nextIsIdiom then chosenIdiom = arg[a]
+	elseif nextIsIdiom then if idioms[arg[a]] then chosenIdiom = arg[a] end
+	elseif arg[a] == "-t" then showTime = true
 	else fileName = arg[a] end
 end
 
@@ -84,13 +87,13 @@ if not f then
 end
 local t = f:read("*all")
 local cloq = os.clock()
-local prgm = load(bfl.buildFromString(t))
+local prgm = load(bfl.buildFromString(idioms[chosenIdiom](t)))
 if prgm == nil then
 	print("bf compile error, probably mismatched []")
 	return 1
 end
-print(string.format("compiled in %d ms",(os.clock()-cloq)*1000))
+if showTime then print(string.format("compiled in %d ms",(os.clock()-cloq)*1000)) end
 local cloq = os.clock()
 prgm()
 print()
-print(string.format("executed in %d ms",(os.clock()-cloq)*1000))
+if showTime then print(string.format("executed in %d ms",(os.clock()-cloq)*1000)) end
