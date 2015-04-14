@@ -1,4 +1,4 @@
---bfl r2.1 by tertu
+--bfl r2.2 by tertu
 --this is public domain software.
 --This library includes functions to convert bf code to Lua, optimizing it slightly.
 --anyfuck.lua, a bf interpreter for Lua using bfl, should be included.
@@ -56,22 +56,20 @@ local mp = 1
 
 function bfl.tokenize(sProgram)
 	local tokenTable = {}
-	local tokenInProgress = {}
-	local currentCharacter = ""
-	local lengthCounter = 0
-	for position=1,#sProgram+1 do
-		currentCharacter = sProgram:sub(position,position)
-		if #tokenInProgress == 0 then
-			prepToken(tokenInProgress, currentCharacter)
-		elseif tokenInProgress[1] ~= currentCharacter then
-			table.insert(tokenTable, tokenInProgress)
-			tokenInProgress = prepToken({},currentCharacter)
-		elseif #sProgram==position then
-			table.insert(tokenTable, tokenInProgress)
-		else
-			tokenInProgress[2] = tokenInProgress[2]+1
+	local tokenInProgress = nil
+
+	local function processCharacter(currentCharacter)
+		if (not tokenInProgress) or tokenInProgress[1]~=currentCharacter then
+			if tokenInProgress then
+				table.insert(tokenTable, tokenInProgress)
+			end
+			tokenInProgress = {op=currentCharacter, count=0}
 		end
+		tokenInProgress.count = tokenInProgress.count + 1
 	end
+
+	sProgram:gsub("(.)",processCharacter)
+	table.insert(tokenTable, tokenInProgress)
 	return tokenTable
 end
 
