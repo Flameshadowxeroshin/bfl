@@ -18,4 +18,4 @@ anyfuck features
 ==
 
 * Support for brainfuck and multiple brainfuck dialects.
-* Records time both for compilation and execution. And you can't turn it off.
+* Records time both for compilation and execution. And you can even turn it off.
