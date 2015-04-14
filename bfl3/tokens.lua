@@ -2,16 +2,20 @@
 --tokens module
 local tokens = {}
 
+function tokens.cleanUp(sProgram)
+	return sProgram:gsub("[^%[%]%.%+%-,<>","")
+end
+
 function tokens.tokenize(sProgram)
 	local tokenTable = {}
 	local tokenInProgress = nil
 
 	local function processCharacter(currentCharacter)
-		if (not tokenInProgress) or tokenInProgress.op~=currentCharacter then
+		if (not tokenInProgress) or tokenInProgress.char~=currentCharacter then
 			if tokenInProgress then
 				table.insert(tokenTable, tokenInProgress)
 			end
-			tokenInProgress = {op=currentCharacter, count=0}
+			tokenInProgress = {char=currentCharacter, count=0}
 		end
 		tokenInProgress.count = tokenInProgress.count + 1
 	end
