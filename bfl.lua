@@ -90,7 +90,7 @@ function bfl.decodeToken(tToken, arrayModCode, cellModCode)
 		for i=1,tToken.count do
 			table.insert(tsBlock,codeBlock)
 		end
-		codeBlock = table.concat(body,"\n")
+		codeBlock = table.concat(tsBlock,"\n")
 	end
 	return codeBlock
 end
