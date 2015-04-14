@@ -42,13 +42,6 @@ end
 
 setArrayCellModCode("","")
 
-
-local function prepToken(tToken,character)
-	tToken[1] = character
-	tToken[2] = 1
-	return tToken
-end
-
 local header = [[local m = {}
 setmetatable(m, {__index = function() return 0 end})
 local mp = 1
